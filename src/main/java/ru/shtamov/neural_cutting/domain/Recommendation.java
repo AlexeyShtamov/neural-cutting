@@ -1,32 +1,32 @@
 package ru.shtamov.neural_cutting.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import lombok.Data;
-import ru.shtamov.neural_cutting.domain.enums.RecommendationType;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import ru.shtamov.neural_cutting.domain.enums.RecommendationPriority;
 
-import java.time.LocalDate;
-
+@Getter
+@Setter
 @Entity
-@Data
-public class Recommendation {
+@Table(name = "recommendations")
+public class Recommendation extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @Column(nullable = false, columnDefinition = "text")
+    private String action;
+
+    @Column(columnDefinition = "text")
+    private String example;
 
     @Enumerated(EnumType.STRING)
-    private RecommendationType recommendationType;
+    @Column(nullable = false, length = 20)
+    private RecommendationPriority priority;
 
-    private String text;
-
-    private LocalDate createdAt;
-
-    @ManyToOne
-    private Problem problem;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private AnalysisResult analysisResult;
 }

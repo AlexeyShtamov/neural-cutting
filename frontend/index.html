@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Cutting MVP Client</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="page">
+    <header class="hero">
+        <div>
+            <p class="eyebrow">MVP client</p>
+            <h1>Neural Cutting</h1>
+            <p class="subtitle">
+                Примитивный фронт для проверки backend-функционала: auth, resumes, resume versions,
+                vacancies, analysis jobs, results и history.
+            </p>
+        </div>
+        <div class="hero-actions">
+            <a class="link-button" href="/swagger-ui.html" target="_blank" rel="noreferrer">Swagger UI</a>
+            <button id="health-check-button" type="button">Проверить health</button>
+        </div>
+    </header>
+
+    <section class="status-grid">
+        <article class="status-card">
+            <h2>Сессия</h2>
+            <div class="status-row">
+                <span>Статус:</span>
+                <strong id="auth-state">не авторизован</strong>
+            </div>
+            <div class="status-row">
+                <span>User ID:</span>
+                <code id="current-user-id">-</code>
+            </div>
+            <div class="status-row">
+                <span>Email:</span>
+                <code id="current-user-email">-</code>
+            </div>
+            <div class="status-row">
+                <span>JWT:</span>
+                <code id="token-preview">-</code>
+            </div>
+            <button id="logout-button" type="button" class="secondary">Очистить токен</button>
+        </article>
+
+        <article class="status-card">
+            <h2>Выбранные сущности</h2>
+            <div class="status-row">
+                <span>Resume:</span>
+                <code id="selected-resume-id">-</code>
+            </div>
+            <div class="status-row">
+                <span>Version:</span>
+                <code id="selected-version-id">-</code>
+            </div>
+            <div class="status-row">
+                <span>Vacancy:</span>
+                <code id="selected-vacancy-id">-</code>
+            </div>
+            <div class="status-row">
+                <span>Job:</span>
+                <code id="selected-job-id">-</code>
+            </div>
+        </article>
+
+        <article class="status-card">
+            <h2>Быстрые подсказки</h2>
+            <ul class="hint-list">
+                <li>Сначала зарегистрируйся или залогинься.</li>
+                <li>Потом создай resume и версию.</li>
+                <li>Создай vacancy и запусти analysis job.</li>
+                <li>Кнопки "Выбрать" заполняют нужные ID автоматически.</li>
+            </ul>
+        </article>
+    </section>
+
+    <main class="content-grid">
+        <section class="panel">
+            <h2>Auth</h2>
+
+            <form id="register-form" class="form-block">
+                <h3>Регистрация</h3>
+                <label>
+                    Имя
+                    <input name="name" type="text" value="Alex Test" maxlength="120" required>
+                </label>
+                <label>
+                    Email
+                    <input name="email" type="email" value="alex@example.com" maxlength="190" required>
+                </label>
+                <label>
+                    Пароль
+                    <input name="password" type="password" value="StrongPass123" minlength="8" maxlength="72" required>
+                </label>
+                <button type="submit">POST /api/auth/register</button>
+            </form>
+
+            <form id="login-form" class="form-block">
+                <h3>Логин</h3>
+                <label>
+                    Email
+                    <input name="email" type="email" value="alex@example.com" maxlength="190" required>
+                </label>
+                <label>
+                    Пароль
+                    <input name="password" type="password" value="StrongPass123" minlength="8" maxlength="72" required>
+                </label>
+                <button type="submit">POST /api/auth/login</button>
+            </form>
+
+            <div class="form-block">
+                <h3>Текущий пользователь</h3>
+                <button id="me-button" type="button">GET /api/auth/me</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Resumes</h2>
+
+            <form id="create-resume-form" class="form-block">
+                <h3>Создать резюме</h3>
+                <label>
+                    Title
+                    <input name="title" type="text" value="Senior Java Backend" maxlength="200" required>
+                </label>
+                <label>
+                    Language
+                    <select name="language" required>
+                        <option value="ENGLISH" selected>ENGLISH</option>
+                        <option value="RUSSIAN">RUSSIAN</option>
+                    </select>
+                </label>
+                <label>
+                    Target role
+                    <input name="targetRole" type="text" value="Senior Backend Engineer" maxlength="200" required>
+                </label>
+                <button type="submit">POST /api/resumes</button>
+            </form>
+
+            <form id="update-resume-form" class="form-block">
+                <h3>Обновить выбранное резюме</h3>
+                <label>
+                    Resume ID
+                    <input id="update-resume-id" name="id" type="text" placeholder="автозаполнение через Выбрать">
+                </label>
+                <label>
+                    Title
+                    <input name="title" type="text" value="Senior Java Backend Updated" maxlength="200">
+                </label>
+                <label>
+                    Language
+                    <select name="language">
+                        <option value="">Не менять</option>
+                        <option value="ENGLISH" selected>ENGLISH</option>
+                        <option value="RUSSIAN">RUSSIAN</option>
+                    </select>
+                </label>
+                <label>
+                    Target role
+                    <input name="targetRole" type="text" value="Lead Backend Engineer" maxlength="200">
+                </label>
+                <button type="submit">PATCH /api/resumes/{id}</button>
+            </form>
+
+            <div class="actions-inline">
+                <button id="load-resumes-button" type="button">GET /api/resumes</button>
+                <button id="resume-detail-button" type="button">GET /api/resumes/{id}</button>
+                <button id="delete-resume-button" type="button" class="danger">DELETE /api/resumes/{id}</button>
+            </div>
+
+            <div id="resumes-list" class="entity-list"></div>
+        </section>
+
+        <section class="panel">
+            <h2>Resume Versions</h2>
+
+            <form id="create-version-text-form" class="form-block">
+                <h3>Добавить текстовую версию</h3>
+                <label>
+                    Resume ID
+                    <input id="version-resume-id" name="resumeId" type="text" placeholder="автозаполнение через Выбрать">
+                </label>
+                <label>
+                    Resume text
+                    <textarea name="text" rows="10" maxlength="50000" required>Senior Java backend engineer with Spring Boot, PostgreSQL, Docker, REST API design, microservices, CI/CD and mentoring experience.</textarea>
+                </label>
+                <button type="submit">POST /api/resumes/{id}/versions/text</button>
+            </form>
+
+            <form id="upload-version-form" class="form-block">
+                <h3>Загрузить PDF/DOCX</h3>
+                <label>
+                    Resume ID
+                    <input id="upload-resume-id" name="resumeId" type="text" placeholder="автозаполнение через Выбрать">
+                </label>
+                <label>
+                    Файл
+                    <input name="file" type="file" accept=".pdf,.doc,.docx" required>
+                </label>
+                <button type="submit">POST /api/resumes/{id}/versions/upload</button>
+            </form>
+
+            <div class="actions-inline">
+                <button id="load-versions-button" type="button">GET /api/resumes/{id}/versions</button>
+                <button id="version-detail-button" type="button">GET /api/resume-versions/{versionId}</button>
+                <button id="history-button" type="button">GET /api/resume-versions/{id}/analysis-history</button>
+            </div>
+
+            <div id="versions-list" class="entity-list"></div>
+        </section>
+
+        <section class="panel">
+            <h2>Vacancies</h2>
+
+            <form id="create-vacancy-form" class="form-block">
+                <h3>Создать vacancy вручную</h3>
+                <label>
+                    Title
+                    <input name="title" type="text" value="Senior Backend Engineer" maxlength="200" required>
+                </label>
+                <label>
+                    Company
+                    <input name="company" type="text" value="ACME" maxlength="200">
+                </label>
+                <label>
+                    URL
+                    <input name="url" type="url" value="https://example.com/jobs/backend" maxlength="500">
+                </label>
+                <label>
+                    Description
+                    <textarea name="text" rows="8" maxlength="50000" required>We need strong Spring Boot, PostgreSQL, Docker, REST APIs, architecture ownership and mentoring skills.</textarea>
+                </label>
+                <button type="submit">POST /api/vacancies/manual</button>
+            </form>
+
+            <div class="actions-inline">
+                <button id="load-vacancies-button" type="button">GET /api/vacancies</button>
+                <button id="vacancy-detail-button" type="button">GET /api/vacancies/{id}</button>
+            </div>
+
+            <div id="vacancies-list" class="entity-list"></div>
+        </section>
+
+        <section class="panel">
+            <h2>Analysis</h2>
+
+            <form id="create-analysis-form" class="form-block">
+                <h3>Запустить analysis job</h3>
+                <label>
+                    Resume version ID
+                    <input id="analysis-version-id" name="resumeVersionId" type="text" placeholder="автозаполнение через Выбрать">
+                </label>
+                <label>
+                    Vacancy ID
+                    <input id="analysis-vacancy-id" name="vacancyId" type="text" placeholder="автозаполнение через Выбрать">
+                </label>
+                <button type="submit">POST /api/analysis-jobs</button>
+            </form>
+
+            <div class="actions-inline">
+                <button id="job-detail-button" type="button">GET /api/analysis-jobs/{id}</button>
+                <button id="job-result-button" type="button">GET /api/analysis-jobs/{id}/result</button>
+            </div>
+        </section>
+
+        <section class="panel wide">
+            <h2>Ответ сервера</h2>
+            <pre id="response-output" class="response-output">Здесь будут показываться ответы API.</pre>
+        </section>
+    </main>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

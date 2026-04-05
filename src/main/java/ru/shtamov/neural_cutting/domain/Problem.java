@@ -1,44 +1,37 @@
 package ru.shtamov.neural_cutting.domain;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import lombok.Data;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 import ru.shtamov.neural_cutting.domain.enums.ProblemCategory;
-import ru.shtamov.neural_cutting.domain.enums.ProblemSection;
+import ru.shtamov.neural_cutting.domain.enums.ProblemSeverity;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
+@Getter
+@Setter
 @Entity
-@Data
-public class Problem {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+@Table(name = "problems")
+public class Problem extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    private ProblemCategory problemCategory;
+    @Column(nullable = false, length = 40)
+    private ProblemCategory category;
 
     @Enumerated(EnumType.STRING)
-    private ProblemSection problemSection;
+    @Column(nullable = false, length = 20)
+    private ProblemSeverity severity;
 
-    private String text;
+    @Column(columnDefinition = "text")
+    private String fragment;
 
-    private String explanation;
-    private LocalDate createdAt;
+    @Column(nullable = false, columnDefinition = "text")
+    private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private AnalysisResult analysisResult;
-
-    @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Recommendation> recommendationList = new ArrayList<>();
 }

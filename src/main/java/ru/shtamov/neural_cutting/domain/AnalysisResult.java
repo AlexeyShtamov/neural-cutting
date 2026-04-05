@@ -1,40 +1,45 @@
 package ru.shtamov.neural_cutting.domain;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import lombok.Data;
-import ru.shtamov.neural_cutting.domain.enums.AnalysisResultGrade;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
-public class AnalysisResult {
+@Table(name = "analysis_results")
+public class AnalysisResult extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @Column(nullable = false)
+    private Integer score;
 
-    @Enumerated(EnumType.STRING)
-    private AnalysisResultGrade analysisResultGrade;
+    @Column(nullable = false, length = 40)
+    private String gradeLabel;
 
-    private Byte score;
-    private LocalDate createdAt;
+    @Column(nullable = false, columnDefinition = "text")
+    private String summary;
 
-    @OneToOne
+    @Column(nullable = false)
+    private Integer overallFitPercent;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     private AnalysisJob analysisJob;
 
     @OneToMany(mappedBy = "analysisResult", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Problem> problemList = new ArrayList<>();
+    @OrderBy("createdAt ASC")
+    private List<Problem> problems = new ArrayList<>();
 
-
+    @OneToMany(mappedBy = "analysisResult", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("createdAt ASC")
+    private List<Recommendation> recommendations = new ArrayList<>();
 }

@@ -1,0 +1,256 @@
+:root {
+    color-scheme: light;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.4;
+    background: #f3f4f6;
+    color: #111827;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #eef2f7;
+    color: #111827;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+}
+
+button.secondary {
+    background: #ffffff;
+    color: #1f2937;
+    border-color: #cbd5e1;
+}
+
+button.danger {
+    background: #b91c1c;
+    border-color: #b91c1c;
+}
+
+.link-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 0.9rem;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #111827;
+    text-decoration: none;
+    border: 1px solid #cbd5e1;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    margin-top: 0.35rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0.65rem 0.75rem;
+    background: #ffffff;
+}
+
+textarea {
+    resize: vertical;
+}
+
+label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.page {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.hero {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+.eyebrow {
+    margin: 0 0 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem;
+    color: #93c5fd;
+}
+
+.hero h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.subtitle {
+    margin: 0.75rem 0 0;
+    max-width: 60rem;
+    color: #cbd5e1;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.status-grid,
+.content-grid {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.status-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.content-grid {
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}
+
+.panel,
+.status-card {
+    background: #ffffff;
+    border: 1px solid #dbe1ea;
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.wide {
+    grid-column: 1 / -1;
+}
+
+.panel h2,
+.status-card h2,
+.form-block h3 {
+    margin-top: 0;
+}
+
+.form-block {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.form-block:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.actions-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.status-row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    margin-bottom: 0.65rem;
+}
+
+code {
+    word-break: break-all;
+    font-size: 0.88rem;
+}
+
+.hint-list {
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.entity-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.entity-card {
+    border: 1px solid #dbe1ea;
+    border-radius: 12px;
+    padding: 0.9rem;
+    background: #f8fafc;
+}
+
+.entity-card h3 {
+    margin: 0 0 0.5rem;
+}
+
+.entity-card p {
+    margin: 0.25rem 0;
+}
+
+.entity-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.entity-actions button {
+    padding: 0.5rem 0.75rem;
+}
+
+.response-output {
+    min-height: 320px;
+    max-height: 760px;
+    overflow: auto;
+    margin: 0;
+    padding: 1rem;
+    border-radius: 12px;
+    background: #0f172a;
+    color: #e2e8f0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+@media (max-width: 900px) {
+    .page {
+        padding: 1rem;
+    }
+
+    .hero {
+        flex-direction: column;
+    }
+
+    .status-row {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+    }
+
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}

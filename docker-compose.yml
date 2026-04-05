@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: neural-cutting-postgres
+    environment:
+      POSTGRES_DB: neural_cutting
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d neural_cutting"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: neural-cutting-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
+      DB_URL: jdbc:postgresql://postgres:5432/neural_cutting
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: change-me-to-a-long-random-secret-with-at-least-32-characters
+      UPLOAD_PATH: /opt/app/uploads
+      ANALYSIS_CLIENT_MODE: stub
+    volumes:
+      - uploaded_files:/opt/app/uploads
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: neural-cutting-frontend
+    depends_on:
+      - app
+    ports:
+      - "8081:80"
+
+volumes:
+  postgres_data:
+  uploaded_files:
