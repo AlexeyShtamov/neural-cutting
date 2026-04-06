@@ -17,10 +17,20 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: production
 
-      - key: DB_URL
+      - key: DB_HOST
         fromDatabase:
           name: neural-cutting-db
-          property: connectionString
+          property: host
+
+      - key: DB_PORT
+        fromDatabase:
+          name: neural-cutting-db
+          property: port
+
+      - key: DB_NAME
+        fromDatabase:
+          name: neural-cutting-db
+          property: database
 
       - key: DB_USERNAME
         fromDatabase:
