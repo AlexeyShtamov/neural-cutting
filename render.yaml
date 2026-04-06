@@ -28,7 +28,7 @@ services:
       - key: DB_URL
         fromDatabase:
           name: neural-cutting-db
-          property: jdbcConnectionString
+          property: connectionString
       - key: DB_USERNAME
         fromDatabase:
           name: neural-cutting-db
