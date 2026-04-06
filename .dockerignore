@@ -1,5 +1,36 @@
-.git
-.idea
-target
-uploads
+# Build artifacts
+target/
+!target/*.jar
+
+# IDE
+.idea/
 *.iml
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# Docker
+docker-compose*.yml
+render.yaml
+
+# Documentation
+*.md
+
+# Frontend (separate deployment)
+frontend/
+
+# Test files
+src/test/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Uploads
+uploads/
