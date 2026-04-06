@@ -1,19 +1,11 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: neural-cutting-db
-    env: docker
-    region: frankfurt
+databases:
+  - name: neural-cutting-db
     plan: free
-    envVars:
-      - key: POSTGRES_DB
-        value: neural_cutting
-      - key: POSTGRES_USER
-        value: postgres
-      - key: POSTGRES_PASSWORD
-        generateValue: true
+    region: frankfurt
+    databaseName: neural_cutting
+    user: postgres
 
-  # Backend API
+services:
   - type: web
     name: neural-cutting-api
     env: docker
@@ -25,27 +17,36 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: production
+
       - key: DB_URL
         fromDatabase:
           name: neural-cutting-db
           property: connectionString
+
       - key: DB_USERNAME
         fromDatabase:
           name: neural-cutting-db
           property: user
+
       - key: DB_PASSWORD
         fromDatabase:
           name: neural-cutting-db
           property: password
+
       - key: DB_POOL_SIZE
         value: 2
+
       - key: JWT_SECRET
         generateValue: true
+
       - key: JWT_EXPIRATION
         value: PT24H
+
       - key: UPLOAD_PATH
         value: /opt/app/uploads
+
       - key: ANALYSIS_CLIENT_MODE
         value: stub
+
       - key: HH_RU_ENABLED
         value: true
