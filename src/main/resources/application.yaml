@@ -97,12 +97,6 @@ spring:
   flyway:
     connect-retries: 10
 
-springdoc:
-  swagger-ui:
-    enabled: false
-  api-docs:
-    enabled: false
-
 logging:
   level:
     root: INFO
