@@ -32,6 +32,15 @@ public class AnalysisResult extends BaseEntity {
     @Column(nullable = false)
     private Integer overallFitPercent;
 
+    @Column
+    private Integer skillMatchPercent;
+
+    @Column(length = 2000)
+    private String matchedSkills;
+
+    @Column(length = 2000)
+    private String missingSkills;
+
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private AnalysisJob analysisJob;
 

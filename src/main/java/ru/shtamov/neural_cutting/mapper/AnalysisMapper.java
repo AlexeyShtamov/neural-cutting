@@ -11,6 +11,8 @@ import ru.shtamov.neural_cutting.dto.analysis.AnalysisResultResponse;
 import ru.shtamov.neural_cutting.dto.analysis.ProblemResponse;
 import ru.shtamov.neural_cutting.dto.analysis.RecommendationResponse;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -42,7 +44,10 @@ public class AnalysisMapper {
                 result.getOverallFitPercent(),
                 result.getCreatedAt(),
                 result.getProblems().stream().map(this::toProblemResponse).toList(),
-                result.getRecommendations().stream().map(this::toRecommendationResponse).toList()
+                result.getRecommendations().stream().map(this::toRecommendationResponse).toList(),
+                result.getSkillMatchPercent(),
+                parseCommaSeparated(result.getMatchedSkills()),
+                parseCommaSeparated(result.getMissingSkills())
         );
     }
 
@@ -87,5 +92,15 @@ public class AnalysisMapper {
                 recommendation.getExample(),
                 recommendation.getPriority()
         );
+    }
+
+    private List<String> parseCommaSeparated(String value) {
+        if (value == null || value.isBlank()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(value.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import ru.shtamov.neural_cutting.integration.vacancy.HhRuApiException;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -59,6 +60,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({StorageException.class, ExternalServiceException.class})
     public ResponseEntity<ApiErrorResponse> handleInfrastructure(RuntimeException exception, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_GATEWAY, exception.getMessage(), request, Map.of());
+    }
+
+    @ExceptionHandler(HhRuApiException.class)
+    public ResponseEntity<ApiErrorResponse> handleHhRuApi(HhRuApiException exception, HttpServletRequest request) {
+        HttpStatus status = exception.getStatusCode() == 429
+                ? HttpStatus.TOO_MANY_REQUESTS
+                : HttpStatus.BAD_GATEWAY;
+        return buildResponse(status, exception.getMessage(), request, Map.of());
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,6 +1,7 @@
 package ru.shtamov.neural_cutting.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/analysis-jobs")
-@Tag(name = "Analysis", description = "Resume analysis jobs and results")
+@Tag(name = "🤖 Анализ", description = "Анализ соответствия резюме вакансии")
 public class AnalysisJobController {
 
     private final AnalysisJobService analysisJobService;
@@ -32,7 +33,9 @@ public class AnalysisJobController {
     }
 
     @PostMapping
-    @Operation(summary = "Create and run analysis job for a resume version and vacancy")
+    @Operation(summary = "Запустить анализ",
+               description = "Создаёт и запускает задачу анализа соответствия резюме вакансии. " +
+                            "Возвращает статус CREATED или RUNNING с ID задачи.")
     public ResponseEntity<AnalysisJobResponse> create(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody CreateAnalysisJobRequest request
@@ -41,19 +44,22 @@ public class AnalysisJobController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get analysis job status")
+    @Operation(summary = "Статус задачи",
+               description = "Возвращает текущий статус задачи анализа (CREATED, RUNNING, SUCCESS, FAILED)")
     public AnalysisJobResponse getById(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id
+            @Parameter(description = "ID задачи анализа") @PathVariable UUID id
     ) {
         return analysisJobService.getJob(user.id(), id);
     }
 
     @GetMapping("/{id}/result")
-    @Operation(summary = "Get completed analysis result")
+    @Operation(summary = "Результат анализа",
+               description = "Возвращает детальный результат анализа: score, проблемы, рекомендации, " +
+                            "процент соответствия навыков, отсутствующие навыки")
     public AnalysisResultResponse getResult(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id
+            @Parameter(description = "ID задачи анализа") @PathVariable UUID id
     ) {
         return analysisJobService.getResult(user.id(), id);
     }

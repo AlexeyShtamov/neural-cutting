@@ -53,6 +53,12 @@ app:
     endpoint: ${ANALYSIS_ENDPOINT:/api/v1/analyze}
     connect-timeout: ${ANALYSIS_CONNECT_TIMEOUT:PT3S}
     read-timeout: ${ANALYSIS_READ_TIMEOUT:PT10S}
+  hh-ru:
+    base-url: ${HH_RU_BASE_URL:https://api.hh.ru}
+    user-agent: ${HH_RU_USER_AGENT:NeuralCutting/1.0}
+    connect-timeout: ${HH_RU_CONNECT_TIMEOUT:PT5S}
+    read-timeout: ${HH_RU_READ_TIMEOUT:PT10S}
+    enabled: ${HH_RU_ENABLED:true}
 
 ---
 spring:

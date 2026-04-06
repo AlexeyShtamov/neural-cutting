@@ -1,6 +1,7 @@
 package ru.shtamov.neural_cutting.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
@@ -16,9 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.shtamov.neural_cutting.dto.common.PageResponse;
 import ru.shtamov.neural_cutting.dto.resume.CreateResumeRequest;
 import ru.shtamov.neural_cutting.dto.resume.CreateResumeVersionTextRequest;
@@ -35,7 +36,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/resumes")
-@Tag(name = "Resumes", description = "Resume and resume version management")
+@Tag(name = "📄 Резюме", description = "Управление резюме и их версиями")
 public class ResumeController {
 
     private final ResumeService resumeService;
@@ -47,7 +48,8 @@ public class ResumeController {
     }
 
     @PostMapping
-    @Operation(summary = "Create a new resume")
+    @Operation(summary = "Создать резюме",
+               description = "Создаёт новое резюме с указанием названия, языка и целевой должности")
     public ResponseEntity<ResumeResponse> create(
             @AuthenticationPrincipal AuthenticatedUser user,
             @Valid @RequestBody CreateResumeRequest request
@@ -56,7 +58,8 @@ public class ResumeController {
     }
 
     @GetMapping
-    @Operation(summary = "Get paginated list of current user's resumes")
+    @Operation(summary = "Список резюме",
+               description = "Возвращает постраничный список резюме текущего пользователя")
     public PageResponse<ResumeResponse> getAll(
             @AuthenticationPrincipal AuthenticatedUser user,
             @ParameterObject @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
@@ -65,59 +68,65 @@ public class ResumeController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get resume details")
+    @Operation(summary = "Детали резюме",
+               description = "Возвращает подробную информацию о резюме со списком версий")
     public ResumeDetailResponse getById(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id
+            @Parameter(description = "ID резюме") @PathVariable UUID id
     ) {
         return resumeService.getResume(user.id(), id);
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "Update resume metadata")
+    @Operation(summary = "Обновить резюме",
+               description = "Обновляет метаданные резюме (название, целевая должность)")
     public ResumeResponse update(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id,
+            @Parameter(description = "ID резюме") @PathVariable UUID id,
             @Valid @RequestBody UpdateResumeRequest request
     ) {
         return resumeService.update(user.id(), id, request);
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete resume and all nested versions/analysis data")
+    @Operation(summary = "Удалить резюме",
+               description = "Удаляет резюме и все связанные версии и результаты анализа")
     public ResponseEntity<Void> delete(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id
+            @Parameter(description = "ID резюме") @PathVariable UUID id
     ) {
         resumeService.delete(user.id(), id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/versions/text")
-    @Operation(summary = "Create a new resume version from plain text")
+    @Operation(summary = "Добавить текстовую версию",
+               description = "Создаёт новую версию резюме из текста")
     public ResponseEntity<ResumeVersionResponse> createTextVersion(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id,
+            @Parameter(description = "ID резюме") @PathVariable UUID id,
             @Valid @RequestBody CreateResumeVersionTextRequest request
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(resumeVersionService.createTextVersion(user.id(), id, request));
     }
 
     @PostMapping("/{id}/versions/upload")
-    @Operation(summary = "Upload PDF/DOC/DOCX as a new resume version")
+    @Operation(summary = "Загрузить файл резюме",
+               description = "Загружает PDF/DOC/DOCX файл как новую версию резюме")
     public ResponseEntity<ResumeVersionResponse> uploadVersion(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id,
+            @Parameter(description = "ID резюме") @PathVariable UUID id,
             @RequestParam("file") MultipartFile file
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(resumeVersionService.uploadVersion(user.id(), id, file));
     }
 
     @GetMapping("/{id}/versions")
-    @Operation(summary = "List resume versions")
+    @Operation(summary = "Список версий резюме",
+               description = "Возвращает все версии указанного резюме")
     public List<ResumeVersionResponse> getVersions(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @PathVariable UUID id
+            @Parameter(description = "ID резюме") @PathVariable UUID id
     ) {
         return resumeVersionService.getVersions(user.id(), id);
     }

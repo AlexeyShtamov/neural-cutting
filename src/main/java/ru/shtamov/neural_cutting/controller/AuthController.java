@@ -20,7 +20,7 @@ import ru.shtamov.neural_cutting.service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Auth", description = "User registration and JWT authentication")
+@Tag(name = "🔐 Авторизация", description = "Регистрация пользователей и JWT аутентификация")
 public class AuthController {
 
     private final AuthService authService;
@@ -30,19 +30,22 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Register a new user")
+    @Operation(summary = "Регистрация нового пользователя",
+               description = "Создаёт новый аккаунт и возвращает JWT токен")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Login and obtain bearer token")
+    @Operation(summary = "Авторизация",
+               description = "Вход в систему по email и паролю, возвращает JWT токен")
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 
     @GetMapping("/me")
-    @Operation(summary = "Get current authenticated user")
+    @Operation(summary = "Профиль пользователя",
+               description = "Возвращает информацию о текущем авторизованном пользователе")
     public UserProfileResponse me(@AuthenticationPrincipal AuthenticatedUser user) {
         return authService.getMe(user.id());
     }

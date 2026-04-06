@@ -6,6 +6,9 @@ import org.springframework.util.StringUtils;
 import ru.shtamov.neural_cutting.domain.enums.ProblemCategory;
 import ru.shtamov.neural_cutting.domain.enums.ProblemSeverity;
 import ru.shtamov.neural_cutting.domain.enums.RecommendationPriority;
+import ru.shtamov.neural_cutting.service.ExtractedSkill;
+import ru.shtamov.neural_cutting.service.SkillExtractorService;
+import ru.shtamov.neural_cutting.service.SkillGapResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +27,12 @@ public class StubAnalysisClient implements AnalysisClient {
             "java", "developer", "engineer", "backend", "spring", "boot", "service", "services", "team"
     );
 
+    private final SkillExtractorService skillExtractorService;
+
+    public StubAnalysisClient(SkillExtractorService skillExtractorService) {
+        this.skillExtractorService = skillExtractorService;
+    }
+
     @Override
     public ExternalAnalysisResponse analyze(ExternalAnalysisRequest request) {
         String resumeText = normalizeText(
@@ -40,10 +49,16 @@ public class StubAnalysisClient implements AnalysisClient {
         Set<String> overlap = new LinkedHashSet<>(resumeTokens);
         overlap.retainAll(vacancyTokens);
 
+        // Skill gap analysis
+        SkillGapResult skillGap = skillExtractorService.analyzeGap(resumeText, vacancyText);
+
         List<ExternalAnalysisResponse.ExternalProblem> problems = new ArrayList<>();
         List<ExternalAnalysisResponse.ExternalRecommendation> recommendations = new ArrayList<>();
 
         int score = 58 + Math.min(overlap.size() * 4, 28);
+
+        // Add skill-based scoring bonus/penalty
+        score = score + (skillGap.matchPercent() / 10) - 5;
 
         if (!StringUtils.hasText(request.resume().text())) {
             score -= 8;
@@ -110,6 +125,27 @@ public class StubAnalysisClient implements AnalysisClient {
             ));
         }
 
+        // Add skill gap problem if there are missing skills
+        if (!skillGap.missingSkills().isEmpty()) {
+            List<String> missingSkillNames = skillGap.missingSkills().stream()
+                    .map(ExtractedSkill::name)
+                    .limit(5)
+                    .toList();
+
+            problems.add(new ExternalAnalysisResponse.ExternalProblem(
+                    ProblemCategory.SKILLS,
+                    skillGap.matchPercent() < 50 ? ProblemSeverity.HIGH : ProblemSeverity.MEDIUM,
+                    String.join(", ", missingSkillNames),
+                    "Several required skills from the vacancy are not mentioned in the resume."
+            ));
+
+            recommendations.add(new ExternalAnalysisResponse.ExternalRecommendation(
+                    "Add the missing skills that match your experience level.",
+                    "Consider highlighting experience with: " + String.join(", ", missingSkillNames) + ".",
+                    RecommendationPriority.HIGH
+            ));
+        }
+
         if (problems.isEmpty()) {
             recommendations.add(new ExternalAnalysisResponse.ExternalRecommendation(
                     "Keep the resume focused on the target role and preserve the current strong signal.",
@@ -121,7 +157,15 @@ public class StubAnalysisClient implements AnalysisClient {
         int boundedScore = Math.max(20, Math.min(score, 96));
         int overallFitPercent = Math.max(25, Math.min(boundedScore + overlap.size(), 98));
         String gradeLabel = gradeForScore(boundedScore);
-        String summary = buildSummary(overlap, missingVacancyKeywords, boundedScore, request);
+        String summary = buildSummary(overlap, missingVacancyKeywords, boundedScore, request, skillGap);
+
+        // Extract skill names for response
+        List<String> matchedSkillNames = skillGap.matchedSkills().stream()
+                .map(ExtractedSkill::name)
+                .toList();
+        List<String> missingSkillNames = skillGap.missingSkills().stream()
+                .map(ExtractedSkill::name)
+                .toList();
 
         return new ExternalAnalysisResponse(
                 boundedScore,
@@ -129,7 +173,10 @@ public class StubAnalysisClient implements AnalysisClient {
                 summary,
                 overallFitPercent,
                 problems,
-                recommendations
+                recommendations,
+                skillGap.matchPercent(),
+                matchedSkillNames,
+                missingSkillNames
         );
     }
 
@@ -176,7 +223,8 @@ public class StubAnalysisClient implements AnalysisClient {
             Set<String> overlap,
             List<String> missingVacancyKeywords,
             int score,
-            ExternalAnalysisRequest request
+            ExternalAnalysisRequest request,
+            SkillGapResult skillGap
     ) {
         StringBuilder builder = new StringBuilder();
         builder.append("Resume version shows ");
@@ -194,6 +242,15 @@ public class StubAnalysisClient implements AnalysisClient {
         }
         if (!missingVacancyKeywords.isEmpty()) {
             builder.append(" Strengthen coverage for ").append(String.join(", ", missingVacancyKeywords)).append(".");
+        }
+        if (skillGap.matchPercent() > 0) {
+            builder.append(" Skill match: ").append(skillGap.matchPercent()).append("%.");
+            if (!skillGap.missingSkills().isEmpty()) {
+                builder.append(" Missing skills: ").append(skillGap.missingSkills().stream()
+                        .map(ExtractedSkill::name)
+                        .limit(3)
+                        .collect(Collectors.joining(", "))).append(".");
+            }
         }
         return builder.toString();
     }

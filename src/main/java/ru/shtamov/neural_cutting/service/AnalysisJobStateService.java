@@ -68,6 +68,9 @@ public class AnalysisJobStateService {
         result.setGradeLabel(response.gradeLabel());
         result.setSummary(response.summary());
         result.setOverallFitPercent(response.overallFitPercent());
+        result.setSkillMatchPercent(response.skillMatchPercent());
+        result.setMatchedSkills(response.matchedSkills() != null ? String.join(", ", response.matchedSkills()) : null);
+        result.setMissingSkills(response.missingSkills() != null ? String.join(", ", response.missingSkills()) : null);
 
         response.problems().forEach(problemData -> {
             Problem problem = new Problem();

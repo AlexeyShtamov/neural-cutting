@@ -12,7 +12,11 @@ public record ExternalAnalysisResponse(
         String summary,
         Integer overallFitPercent,
         List<ExternalProblem> problems,
-        List<ExternalRecommendation> recommendations
+        List<ExternalRecommendation> recommendations,
+        // Skill match fields
+        Integer skillMatchPercent,
+        List<String> matchedSkills,
+        List<String> missingSkills
 ) {
     public record ExternalProblem(
             ProblemCategory category,
